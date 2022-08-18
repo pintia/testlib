@@ -4088,49 +4088,17 @@ void registerInteraction(int argc, char *argv[]) {
     testlibMode = _interactor;
     __testlib_set_binary(stdin);
 
-    if (argc > 1 && !strcmp("--help", argv[1]))
-        __testlib_help();
+    resultName = "";
+    appesMode = false;
 
-    if (argc < 3 || argc > 6) {
-        quit(_fail, std::string("Program must be run with the following arguments: ") +
-                    std::string("<input-file> <output-file> [<answer-file> [<report-file> [<-appes>]]]") +
-                    "\nUse \"--help\" to get help information");
-    }
+    inf.init("input", _input);
 
-    if (argc <= 4) {
-        resultName = "";
-        appesMode = false;
-    }
-
-#ifndef EJUDGE
-    if (argc == 5) {
-        resultName = argv[4];
-        appesMode = false;
-    }
-
-    if (argc == 6) {
-        if (strcmp("-APPES", argv[5]) && strcmp("-appes", argv[5])) {
-            quit(_fail, std::string("Program must be run with the following arguments: ") +
-                        "<input-file> <output-file> <answer-file> [<report-file> [<-appes>]]");
-        } else {
-            resultName = argv[4];
-            appesMode = true;
-        }
-    }
-#endif
-
-    inf.init(argv[1], _input);
-
-    tout.open(argv[2], std::ios_base::out);
+    tout.open(argv[1], std::ios_base::out);
     if (tout.fail() || !tout.is_open())
-        quit(_fail, std::string("Can not write to the test-output-file '") + argv[2] + std::string("'"));
+        quit(_fail, std::string("Can not write to the test-output-file '") + argv[1] + std::string("'"));
 
     ouf.init(stdin, _output);
-
-    if (argc >= 4)
-        ans.init(argv[3], _answer);
-    else
-        ans.name = "unopened answer stream";
+    ans.init("output", _answer);
 }
 
 void registerValidation() {
