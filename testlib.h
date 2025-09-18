@@ -2479,7 +2479,7 @@ int resultExitCode(TResult r) {
     if (r == _wa)
         return WA_EXIT_CODE;
     if (r == _pe)
-        return PE_EXIT_CODE;
+        return WA_EXIT_CODE;
     if (r == _fail)
         return FAIL_EXIT_CODE;
     if (r == _dirt)
