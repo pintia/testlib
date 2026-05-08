@@ -158,6 +158,7 @@ const char *latestFeatures[] = {
 /* Overrides random() for Borland C++. */
 #define random __random_deprecated
 #include <stdlib.h>
+#include <cstdint>
 #include <cstdlib>
 #include <climits>
 #include <algorithm>
