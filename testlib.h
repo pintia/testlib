@@ -2910,7 +2910,7 @@ int resultExitCode(TResult r) {
     if (r == _wa)
         return WA_EXIT_CODE;
     if (r == _pe)
-        return PE_EXIT_CODE;
+        return WA_EXIT_CODE;
     if (r == _fail)
         return FAIL_EXIT_CODE;
     if (r == _dirt)
@@ -4674,49 +4674,15 @@ void registerInteraction(int argc, char *argv[]) {
     testlibMode = _interactor;
     __testlib_set_binary(stdin);
 
-    if (argc > 1 && !strcmp("--help", argv[1]))
-        __testlib_help();
-
-    if (argc < 3 || argc > 6) {
-        quit(_fail, std::string("Program must be run with the following arguments: ") +
-                    std::string("<input-file> <output-file> [<answer-file> [<report-file> [<-appes>]]]") +
-                    "\nUse \"--help\" to get help information");
-    }
-
-    if (argc <= 4) {
-        resultName = "";
-        appesMode = false;
-    }
-
-#ifndef EJUDGE
-    if (argc == 5) {
-        resultName = argv[4];
-        appesMode = false;
-    }
-
-    if (argc == 6) {
-        if (strcmp("-APPES", argv[5]) && strcmp("-appes", argv[5])) {
-            quit(_fail, std::string("Program must be run with the following arguments: ") +
-                        "<input-file> <output-file> <answer-file> [<report-file> [<-appes>]]");
-        } else {
-            resultName = argv[4];
-            appesMode = true;
-        }
-    }
-#endif
-
-    inf.init(argv[1], _input);
-
-    tout.open(argv[2], std::ios_base::out);
+    resultName = "";
+    appesMode = false;
+    inf.init("input", _input);
+    tout.open(argv[1], std::ios_base::out);
     if (tout.fail() || !tout.is_open())
-        quit(_fail, std::string("Can not write to the test-output-file '") + argv[2] + std::string("'"));
+        quit(_fail, std::string("Can not write to the test-output-file '") + argv[1] + std::string("'"));
 
     ouf.init(stdin, _output);
-
-    if (argc >= 4)
-        ans.init(argv[3], _answer);
-    else
-        ans.name = "unopened answer stream";
+    ans.init("output", _answer);
 }
 
 void registerValidation() {
@@ -4848,60 +4814,12 @@ void registerTestlibCmd(int argc, char *argv[]) {
     testlibMode = _checker;
     __testlib_set_binary(stdin);
 
-    std::vector<std::string> args(1, argv[0]);
-    checker.initialize();
+    resultName = "";
+    appesMode = false;
 
-    for (int i = 1; i < argc; i++) {
-        if (!strcmp("--testset", argv[i])) {
-            if (i + 1 < argc && strlen(argv[i + 1]) > 0)
-                checker.setTestset(argv[++i]);
-            else
-                quit(_fail, std::string("Expected testset after --testset command line parameter"));
-        } else if (!strcmp("--group", argv[i])) {
-            if (i + 1 < argc)
-                checker.setGroup(argv[++i]);
-            else
-                quit(_fail, std::string("Expected group after --group command line parameter"));
-        } else
-            args.push_back(argv[i]);
-    }
-
-    argc = int(args.size());
-    if (argc > 1 && "--help" == args[1])
-        __testlib_help();
-
-    if (argc < 4 || argc > 6) {
-        quit(_fail, std::string("Program must be run with the following arguments: ") +
-                    std::string("[--testset testset] [--group group] <input-file> <output-file> <answer-file> [<report-file> [<-appes>]]") +
-                    "\nUse \"--help\" to get help information");
-    }
-
-    if (argc == 4) {
-        resultName = "";
-        appesMode = false;
-    }
-
-#ifndef EJUDGE
-    if (argc == 5) {
-        resultName = args[4];
-        appesMode = false;
-    }
-
-    if (argc == 6) {
-        if ("-APPES" != args[5] && "-appes" != args[5]) {
-            quit(_fail, std::string("Program must be run with the following arguments: ") +
-                        "<input-file> <output-file> <answer-file> [<report-file> [<-appes>]]");
-        } else {
-            resultName = args[4];
-            appesMode = true;
-        }
-    }
-#endif
-
-    inf.init(args[1], _input);
-    ouf.init(args[2], _output);
-    ouf.skipBom();
-    ans.init(args[3], _answer);
+    inf.init("input", _input);
+    ouf.init(argv[1], _output);
+    ans.init("output", _answer);
 }
 
 void registerTestlib(int argc, ...) {
